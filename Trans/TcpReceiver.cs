@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -10,20 +11,21 @@ namespace Trans
 {
 	public class TcpReceiver : TcpFuncs
 	{
-		private IPAddress localIP;
-		private int localPort;
-		private Thread thread;
-		private TcpClient tcpClient;
-		private TcpListener tcpListener;
-		private bool connect;
-		private IPAddress remoteIP;
-		private int remotePort;
-		private string savePath;
-		private string fileName;
-		private FileStream fileStream;
-		private long fileSize;
-		private long gotBytes;
-		private bool isContinue;
+		protected IPAddress localIP;
+		protected int localPort;
+		protected Thread thread;
+		protected TcpClient tcpClient;
+		protected TcpListener tcpListener;
+		protected bool connect;
+		protected IPAddress remoteIP;
+		protected int remotePort;
+		protected string savePath;
+		protected string fileName;
+		protected FileStream fileStream;
+		protected long fileSize;
+		protected byte[] fileHash;
+		protected long gotBytes;
+		protected bool isContinue;
 
 		public long GetGotBytes
 		{
@@ -84,8 +86,8 @@ namespace Trans
 
 		public void Run()
 		{
-			try
-			{
+			/*try
+			{*/
 				if (connect)
 				{
 					tcpClient = ConnectAndSendBeginBytes(remoteIP, remotePort);
@@ -99,11 +101,16 @@ namespace Trans
 					ReceiveFileData(stream);
 					long startPos = CheckIsContinueNeeded();
 					SendStartPos(startPos, stream);
-					if (startPos > 0L)
+					if (startPos > 0)
 					{
 						isContinue = true;
-					}else if (startPos != -1)
-                    {
+					}
+					if (startPos == -1)
+					{
+						OnReceiveMessage(ReceiverMessageType.SIZES_ARE_EQUAL, "Файл уже загружен");
+					}
+					else
+					{
 						ReceiveFile(startPos, stream);
 					}
 				}
@@ -112,51 +119,56 @@ namespace Trans
 				{
 					tcpListener.Stop();
 				}
-			}
+			/*}
 			catch (Exception ex)
 			{
 				OnReceiveError(ex.Message);
 				Abort();
-			}
+			}*/
 			OnReceiveFinished();
 		}
 
-		private long CheckIsContinueNeeded()
+		/// <summary>
+		/// Check file exist, file size and hashes
+		/// </summary>
+		/// <returns>
+		/// Returns which byte to start loading from or
+		/// -1 then sizes are equal
+		/// </returns>
+		protected long CheckIsContinueNeeded()
 		{
 			if (File.Exists(savePath + fileName))
 			{
-				FileStream fileStream = File.OpenRead(savePath + fileName);
-				long length = fileStream.Length;
-				fileStream.Close();
-				if (length < fileSize)
-				{
-					return length;
-				}
-				if (length == fileSize)
-				{
-					return -1L;
+				using (FileStream fileStream = File.OpenRead(savePath + fileName)) {
+					long length = fileStream.Length;
+					if (length < fileSize)
+					{
+						return length;
+					}
+					if (length == fileSize)
+					{
+						return -1;
+					}
 				}
 			}
-			return 0L;
+			return 0;
 		}
 
-		private void SendStartPos(long startPos, NetworkStream netStream)
+		protected void SendStartPos(long startPos, NetworkStream netStream)
         {
 			byte[] bytes = BitConverter.GetBytes(startPos);
 			Send(netStream, bytes);
 		}
 
-		private void ReceiveFileData(NetworkStream netStream)
+		protected void ReceiveFileData(NetworkStream netStream)
 		{
-			string[] array = Encoding.UTF8.GetString(Receive(netStream)).Split(new char[]
-			{
-				'*'
-			});
+			//Receive file name and file size
+			string[] array = Encoding.UTF8.GetString(Receive(netStream)).Split(new char[]{'*'});
 			fileName = array[0];
 			fileSize = long.Parse(array[1]);
 		}
 
-		private void ReceiveFile(long startPos, NetworkStream netStream)
+		protected void ReceiveFile(long startPos, NetworkStream netStream)
 		{
 			if (startPos == 0L)
 			{
@@ -177,11 +189,17 @@ namespace Trans
 		}
 
 		public event TcpReceiver.TcpEventHandler OnReceiveFinished;
-
 		public event TcpReceiver.TcpErrorHandler OnReceiveError;
+		public event TcpReceiver.TcpMessageHandler OnReceiveMessage;
 
 		public delegate void TcpEventHandler();
-
 		public delegate void TcpErrorHandler(string message);
+		public delegate void TcpMessageHandler(ReceiverMessageType type, string text);
+	}
+
+	public enum ReceiverMessageType
+	{
+		NO_TYPE,
+		SIZES_ARE_EQUAL
 	}
 }

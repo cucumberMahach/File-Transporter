@@ -53,11 +53,13 @@
             this.pic_plot = new System.Windows.Forms.PictureBox();
             this.lab_maxSpeed = new System.Windows.Forms.Label();
             this.lab_minSpeed = new System.Windows.Forms.Label();
+            this.panel_trans = new System.Windows.Forms.Panel();
             this.group_send.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.num_bufferSize)).BeginInit();
             this.group_receive.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pic_progress)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pic_plot)).BeginInit();
+            this.panel_trans.SuspendLayout();
             this.SuspendLayout();
             // 
             // group_send
@@ -69,9 +71,9 @@
             this.group_send.Controls.Add(this.btn_selectFile);
             this.group_send.Controls.Add(this.lab_fileName);
             this.group_send.Controls.Add(this.label7);
-            this.group_send.Location = new System.Drawing.Point(12, 125);
+            this.group_send.Location = new System.Drawing.Point(8, 120);
             this.group_send.Name = "group_send";
-            this.group_send.Size = new System.Drawing.Size(428, 81);
+            this.group_send.Size = new System.Drawing.Size(420, 81);
             this.group_send.TabIndex = 0;
             this.group_send.TabStop = false;
             this.group_send.Text = "Отправка";
@@ -80,7 +82,7 @@
             // 
             this.num_bufferSize.Location = new System.Drawing.Point(131, 55);
             this.num_bufferSize.Maximum = new decimal(new int[] {
-            1024,
+            16384,
             0,
             0,
             0});
@@ -118,7 +120,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lab_fileName.Location = new System.Drawing.Point(90, 24);
             this.lab_fileName.Name = "lab_fileName";
-            this.lab_fileName.Size = new System.Drawing.Size(320, 19);
+            this.lab_fileName.Size = new System.Drawing.Size(312, 19);
             this.lab_fileName.TabIndex = 4;
             this.lab_fileName.Text = "Не выбран";
             this.lab_fileName.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -136,9 +138,9 @@
             // 
             this.btn_send.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn_send.Location = new System.Drawing.Point(12, 212);
+            this.btn_send.Location = new System.Drawing.Point(8, 207);
             this.btn_send.Name = "btn_send";
-            this.btn_send.Size = new System.Drawing.Size(428, 23);
+            this.btn_send.Size = new System.Drawing.Size(420, 23);
             this.btn_send.TabIndex = 5;
             this.btn_send.Text = "Отправить";
             this.btn_send.UseVisualStyleBackColor = true;
@@ -151,9 +153,9 @@
             this.group_receive.Controls.Add(this.btn_selectDir);
             this.group_receive.Controls.Add(this.txt_saveIn);
             this.group_receive.Controls.Add(this.label9);
-            this.group_receive.Location = new System.Drawing.Point(12, 245);
+            this.group_receive.Location = new System.Drawing.Point(8, 240);
             this.group_receive.Name = "group_receive";
-            this.group_receive.Size = new System.Drawing.Size(428, 58);
+            this.group_receive.Size = new System.Drawing.Size(420, 58);
             this.group_receive.TabIndex = 1;
             this.group_receive.TabStop = false;
             this.group_receive.Text = "Прием";
@@ -175,7 +177,7 @@
             this.txt_saveIn.Location = new System.Drawing.Point(125, 26);
             this.txt_saveIn.Name = "txt_saveIn";
             this.txt_saveIn.ReadOnly = true;
-            this.txt_saveIn.Size = new System.Drawing.Size(285, 20);
+            this.txt_saveIn.Size = new System.Drawing.Size(277, 20);
             this.txt_saveIn.TabIndex = 8;
             // 
             // label9
@@ -191,9 +193,9 @@
             // 
             this.btn_receive.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn_receive.Location = new System.Drawing.Point(12, 309);
+            this.btn_receive.Location = new System.Drawing.Point(8, 304);
             this.btn_receive.Name = "btn_receive";
-            this.btn_receive.Size = new System.Drawing.Size(428, 23);
+            this.btn_receive.Size = new System.Drawing.Size(420, 23);
             this.btn_receive.TabIndex = 9;
             this.btn_receive.Text = "Принять";
             this.btn_receive.UseVisualStyleBackColor = true;
@@ -202,7 +204,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(9, 9);
+            this.label1.Location = new System.Drawing.Point(5, 4);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(93, 13);
             this.label1.TabIndex = 2;
@@ -212,7 +214,7 @@
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(275, 9);
+            this.label2.Location = new System.Drawing.Point(263, 4);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(107, 13);
             this.label2.TabIndex = 3;
@@ -221,7 +223,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 36);
+            this.label3.Location = new System.Drawing.Point(8, 31);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(17, 13);
             this.label3.TabIndex = 4;
@@ -230,7 +232,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(12, 71);
+            this.label4.Location = new System.Drawing.Point(8, 66);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(32, 13);
             this.label4.TabIndex = 5;
@@ -238,7 +240,7 @@
             // 
             // txt_this_port
             // 
-            this.txt_this_port.Location = new System.Drawing.Point(50, 68);
+            this.txt_this_port.Location = new System.Drawing.Point(46, 63);
             this.txt_this_port.Name = "txt_this_port";
             this.txt_this_port.Size = new System.Drawing.Size(127, 20);
             this.txt_this_port.TabIndex = 7;
@@ -246,7 +248,7 @@
             // txt_dist_port
             // 
             this.txt_dist_port.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txt_dist_port.Location = new System.Drawing.Point(313, 68);
+            this.txt_dist_port.Location = new System.Drawing.Point(301, 63);
             this.txt_dist_port.Name = "txt_dist_port";
             this.txt_dist_port.Size = new System.Drawing.Size(127, 20);
             this.txt_dist_port.TabIndex = 11;
@@ -254,7 +256,7 @@
             // txt_dist_ip
             // 
             this.txt_dist_ip.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txt_dist_ip.Location = new System.Drawing.Point(313, 36);
+            this.txt_dist_ip.Location = new System.Drawing.Point(301, 31);
             this.txt_dist_ip.Name = "txt_dist_ip";
             this.txt_dist_ip.Size = new System.Drawing.Size(127, 20);
             this.txt_dist_ip.TabIndex = 10;
@@ -263,7 +265,7 @@
             // 
             this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(275, 71);
+            this.label5.Location = new System.Drawing.Point(263, 66);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(32, 13);
             this.label5.TabIndex = 9;
@@ -273,7 +275,7 @@
             // 
             this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(275, 36);
+            this.label6.Location = new System.Drawing.Point(263, 31);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(17, 13);
             this.label6.TabIndex = 8;
@@ -282,7 +284,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(9, 348);
+            this.label8.Location = new System.Drawing.Point(5, 343);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(59, 13);
             this.label8.TabIndex = 13;
@@ -291,7 +293,7 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(9, 372);
+            this.label10.Location = new System.Drawing.Point(5, 367);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(58, 13);
             this.label10.TabIndex = 14;
@@ -302,9 +304,9 @@
             this.pic_progress.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pic_progress.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pic_progress.Location = new System.Drawing.Point(9, 397);
+            this.pic_progress.Location = new System.Drawing.Point(8, 389);
             this.pic_progress.Name = "pic_progress";
-            this.pic_progress.Size = new System.Drawing.Size(428, 26);
+            this.pic_progress.Size = new System.Drawing.Size(420, 26);
             this.pic_progress.TabIndex = 19;
             this.pic_progress.TabStop = false;
             this.pic_progress.SizeChanged += new System.EventHandler(this.pic_progress_SizeChanged);
@@ -313,7 +315,7 @@
             // lab_time
             // 
             this.lab_time.AutoSize = true;
-            this.lab_time.Location = new System.Drawing.Point(74, 348);
+            this.lab_time.Location = new System.Drawing.Point(70, 343);
             this.lab_time.Name = "lab_time";
             this.lab_time.Size = new System.Drawing.Size(34, 13);
             this.lab_time.TabIndex = 20;
@@ -322,7 +324,7 @@
             // lab_speed
             // 
             this.lab_speed.AutoSize = true;
-            this.lab_speed.Location = new System.Drawing.Point(74, 372);
+            this.lab_speed.Location = new System.Drawing.Point(70, 367);
             this.lab_speed.Name = "lab_speed";
             this.lab_speed.Size = new System.Drawing.Size(53, 13);
             this.lab_speed.TabIndex = 21;
@@ -331,7 +333,7 @@
             // comb_this_ip
             // 
             this.comb_this_ip.FormattingEnabled = true;
-            this.comb_this_ip.Location = new System.Drawing.Point(50, 33);
+            this.comb_this_ip.Location = new System.Drawing.Point(46, 28);
             this.comb_this_ip.Name = "comb_this_ip";
             this.comb_this_ip.Size = new System.Drawing.Size(127, 21);
             this.comb_this_ip.TabIndex = 22;
@@ -345,7 +347,7 @@
             // 
             this.rb_this.AutoSize = true;
             this.rb_this.Checked = true;
-            this.rb_this.Location = new System.Drawing.Point(15, 94);
+            this.rb_this.Location = new System.Drawing.Point(11, 89);
             this.rb_this.Name = "rb_this";
             this.rb_this.Size = new System.Drawing.Size(62, 17);
             this.rb_this.TabIndex = 9;
@@ -357,7 +359,7 @@
             // 
             this.rb_dist.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.rb_dist.AutoSize = true;
-            this.rb_dist.Location = new System.Drawing.Point(278, 94);
+            this.rb_dist.Location = new System.Drawing.Point(266, 89);
             this.rb_dist.Name = "rb_dist";
             this.rb_dist.Size = new System.Drawing.Size(62, 17);
             this.rb_dist.TabIndex = 23;
@@ -370,9 +372,9 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pic_plot.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pic_plot.Location = new System.Drawing.Point(9, 439);
+            this.pic_plot.Location = new System.Drawing.Point(8, 434);
             this.pic_plot.Name = "pic_plot";
-            this.pic_plot.Size = new System.Drawing.Size(363, 68);
+            this.pic_plot.Size = new System.Drawing.Size(352, 70);
             this.pic_plot.TabIndex = 24;
             this.pic_plot.TabStop = false;
             this.pic_plot.SizeChanged += new System.EventHandler(this.pic_plot_SizeChanged);
@@ -382,7 +384,7 @@
             // 
             this.lab_maxSpeed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lab_maxSpeed.AutoSize = true;
-            this.lab_maxSpeed.Location = new System.Drawing.Point(376, 434);
+            this.lab_maxSpeed.Location = new System.Drawing.Point(364, 429);
             this.lab_maxSpeed.Name = "lab_maxSpeed";
             this.lab_maxSpeed.Size = new System.Drawing.Size(62, 13);
             this.lab_maxSpeed.TabIndex = 25;
@@ -392,41 +394,52 @@
             // 
             this.lab_minSpeed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lab_minSpeed.AutoSize = true;
-            this.lab_minSpeed.Location = new System.Drawing.Point(376, 499);
+            this.lab_minSpeed.Location = new System.Drawing.Point(364, 496);
             this.lab_minSpeed.Name = "lab_minSpeed";
             this.lab_minSpeed.Size = new System.Drawing.Size(62, 13);
             this.lab_minSpeed.TabIndex = 26;
             this.lab_minSpeed.Text = "0 байт/сек";
             // 
+            // panel_trans
+            // 
+            this.panel_trans.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel_trans.Controls.Add(this.label1);
+            this.panel_trans.Controls.Add(this.lab_minSpeed);
+            this.panel_trans.Controls.Add(this.group_send);
+            this.panel_trans.Controls.Add(this.lab_maxSpeed);
+            this.panel_trans.Controls.Add(this.group_receive);
+            this.panel_trans.Controls.Add(this.pic_plot);
+            this.panel_trans.Controls.Add(this.label2);
+            this.panel_trans.Controls.Add(this.btn_receive);
+            this.panel_trans.Controls.Add(this.label3);
+            this.panel_trans.Controls.Add(this.rb_dist);
+            this.panel_trans.Controls.Add(this.label4);
+            this.panel_trans.Controls.Add(this.btn_send);
+            this.panel_trans.Controls.Add(this.txt_this_port);
+            this.panel_trans.Controls.Add(this.rb_this);
+            this.panel_trans.Controls.Add(this.label6);
+            this.panel_trans.Controls.Add(this.comb_this_ip);
+            this.panel_trans.Controls.Add(this.label5);
+            this.panel_trans.Controls.Add(this.lab_speed);
+            this.panel_trans.Controls.Add(this.txt_dist_ip);
+            this.panel_trans.Controls.Add(this.lab_time);
+            this.panel_trans.Controls.Add(this.txt_dist_port);
+            this.panel_trans.Controls.Add(this.pic_progress);
+            this.panel_trans.Controls.Add(this.label8);
+            this.panel_trans.Controls.Add(this.label10);
+            this.panel_trans.Location = new System.Drawing.Point(12, 12);
+            this.panel_trans.Name = "panel_trans";
+            this.panel_trans.Size = new System.Drawing.Size(436, 519);
+            this.panel_trans.TabIndex = 27;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(452, 521);
-            this.Controls.Add(this.lab_minSpeed);
-            this.Controls.Add(this.lab_maxSpeed);
-            this.Controls.Add(this.pic_plot);
-            this.Controls.Add(this.btn_receive);
-            this.Controls.Add(this.rb_dist);
-            this.Controls.Add(this.btn_send);
-            this.Controls.Add(this.rb_this);
-            this.Controls.Add(this.comb_this_ip);
-            this.Controls.Add(this.lab_speed);
-            this.Controls.Add(this.lab_time);
-            this.Controls.Add(this.pic_progress);
-            this.Controls.Add(this.label10);
-            this.Controls.Add(this.label8);
-            this.Controls.Add(this.txt_dist_port);
-            this.Controls.Add(this.txt_dist_ip);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.txt_this_port);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.group_receive);
-            this.Controls.Add(this.group_send);
+            this.ClientSize = new System.Drawing.Size(459, 541);
+            this.Controls.Add(this.panel_trans);
             this.MinimumSize = new System.Drawing.Size(468, 560);
             this.Name = "FormMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -439,8 +452,9 @@
             this.group_receive.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pic_progress)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pic_plot)).EndInit();
+            this.panel_trans.ResumeLayout(false);
+            this.panel_trans.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
 		}
 
@@ -551,5 +565,6 @@
 
 		// Token: 0x0400003D RID: 61
 		private global::System.Windows.Forms.Label lab_minSpeed;
-	}
+        private System.Windows.Forms.Panel panel_trans;
+    }
 }

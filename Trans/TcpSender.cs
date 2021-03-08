@@ -10,22 +10,22 @@ namespace Trans
 {
     public class TcpSender : TcpFuncs
     {
-        private IPAddress remoteIP;
-        private int remotePort;
-        private Thread thread;
-        private TcpClient tcpClient;
-        private TcpListener tcpListener;
-        private string filePath;
-        private string fileName;
-        private bool connect;
-        private int bufferSize;
-        private long uploadedBytes;
-        private long fileSize;
-        private bool isContinue;
-        private IPAddress localIP;
-        private int localPort;
+        protected IPAddress remoteIP;
+        protected int remotePort;
+        protected Thread thread;
+        protected TcpClient tcpClient;
+        protected TcpListener tcpListener;
+        protected string filePath;
+        protected string fileName;
+        protected bool connect;
+        protected int bufferSize;
+        protected long uploadedBytes;
+        protected long fileSize;
+        protected bool isContinue;
+        protected IPAddress localIP;
+        protected int localPort;
 
-        private bool isAborted = false;
+        protected bool isAborted = false;
 
         public long GetFileSize
         {
@@ -87,8 +87,8 @@ namespace Trans
 
         public void Run()
         {
-            try
-            {
+            /*try
+            {*/
                 if (connect)
                 {
                     tcpClient = ConnectAndSendBeginBytes(remoteIP, remotePort);
@@ -103,8 +103,14 @@ namespace Trans
                     {
                         SendFileData(fileStream, stream);
                         uploadedBytes = ReceiveUploadedBytes(stream);
-                        if (uploadedBytes != -1)
+                        if (uploadedBytes == -1)
+                        {
+                            OnUploadMessage(SenderMessageType.SIZES_ARE_EQUAL, "Файл уже загружен");
+                        }
+                        else
+                        {
                             SendFile(fileStream, stream);
+                        }
                     }
                 }
                 tcpClient.Close();
@@ -112,36 +118,42 @@ namespace Trans
                 {
                     tcpListener.Stop();
                 }
-            }
+            /*}
             catch (Exception ex)
             {
                 if (ex is ThreadAbortException || ex is ThreadStateException)
                     return;
                 OnUploadError(ex.Message);
                 Abort();
-            }
+            }*/
             OnUploadFinished();
         }
 
-        private long ReceiveUploadedBytes(NetworkStream netStream)
+        protected long ReceiveUploadedBytes(NetworkStream netStream)
         {
             byte[] value = Receive(netStream);
             return BitConverter.ToInt64(value, 0);
         }
 
-        private void SendFileData(FileStream fileStream, NetworkStream netStream)
+        protected void SendFileData(FileStream fileStream, NetworkStream netStream)
         {
-            byte[] bytes = Encoding.UTF8.GetBytes(fileName + "*" + fileStream.Length.ToString());
-            Send(netStream, bytes);
+            byte[] bytes = Encoding.UTF8.GetBytes(
+                fileName + "*" + fileStream.Length.ToString()
+                );
+            Send(netStream, bytes); //File name and file size
         }
 
-        private void SendFile(FileStream fileStream, NetworkStream netStream)
+        protected void SendFile(FileStream fileStream, NetworkStream netStream)
         {
             fileSize = fileStream.Length;
             if (uploadedBytes != 0L)
             {
                 isContinue = true;
                 fileStream.Seek(uploadedBytes, SeekOrigin.Begin);
+            }
+            else
+            {
+                fileStream.Position = 0;
             }
             byte[] array;
             if (fileSize - uploadedBytes < bufferSize)
@@ -165,11 +177,17 @@ namespace Trans
         }
 
         public event TcpSender.TcpEventHandler OnUploadFinished;
-
         public event TcpSender.TcpErrorHandler OnUploadError;
+        public event TcpSender.TcpMessageHandler OnUploadMessage;
 
         public delegate void TcpEventHandler();
-
         public delegate void TcpErrorHandler(string message);
+        public delegate void TcpMessageHandler(SenderMessageType type, string text);
+    }
+
+    public enum SenderMessageType
+    {
+        NO_TYPE,
+        SIZES_ARE_EQUAL
     }
 }

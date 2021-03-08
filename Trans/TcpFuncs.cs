@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.IO.Compression;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -9,6 +11,12 @@ namespace Trans
 	public abstract class TcpFuncs
 	{
 		protected BinaryFormatter formatter = new BinaryFormatter();
+
+        public TcpFuncs()
+        {
+			
+		}
+
 		protected void ListenAndCheckBeginBytes(IPAddress localIP, int localPort, ref TcpListener tcpListener, ref TcpClient tcpClient)
 		{
 			tcpListener = new TcpListener(localIP, localPort);
@@ -52,12 +60,12 @@ namespace Trans
 
 		protected void Send(NetworkStream stream, byte[] data)
 		{
-			formatter.Serialize(stream, data);
+			formatter.Serialize(stream, Tools.Compress7Zip(data));
 		}
 
 		protected byte[] Receive(NetworkStream stream)
 		{
-			return (byte[])formatter.Deserialize(stream);
+			return Tools.Decompress7Zip((byte[])formatter.Deserialize(stream));
 		}
 
 		protected bool IsValidBeginBytes(NetworkStream stream, byte[] beginBytes)

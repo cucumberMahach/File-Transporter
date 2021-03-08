@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Net;
@@ -9,7 +8,7 @@ using System.Windows.Forms;
 
 namespace Trans
 {
-	public partial class FormMain : Form
+    public partial class FormMain : Form
 	{
 		private SynchronizationContext guiContext;
 		private string sendFilePath;
@@ -104,6 +103,7 @@ namespace Trans
 				tcpReceiver = new TcpReceiver(IPAddress.Parse(comb_this_ip.Text), int.Parse(txt_this_port.Text), IPAddress.Parse(txt_dist_ip.Text), int.Parse(txt_dist_port.Text), txt_saveIn.Text, rb_dist.Checked);
 				tcpReceiver.OnReceiveFinished += TcpReceiver_OnReceiveFinished;
 				tcpReceiver.OnReceiveError += TcpReceiver_OnError;
+				tcpReceiver.OnReceiveMessage += TcpReceiver_OnMessage;
 				stopwatch.Start();
 				tcpReceiver.Start();
 			}
@@ -137,6 +137,7 @@ namespace Trans
 				tcpSender = new TcpSender(IPAddress.Parse(comb_this_ip.Text), int.Parse(txt_this_port.Text), IPAddress.Parse(txt_dist_ip.Text), int.Parse(txt_dist_port.Text), sendFilePath, lab_fileName.Text, (int)num_bufferSize.Value, rb_dist.Checked);
 				tcpSender.OnUploadFinished += TcpSender_OnUploadFinished;
 				tcpSender.OnUploadError += TcpSender_OnError;
+				tcpSender.OnUploadMessage += TcpSender_OnMessage;
 				stopwatch.Start();
 				tcpSender.Start();
 			}
@@ -147,6 +148,22 @@ namespace Trans
 				SetEnableControls(true);
 				btn_send.Text = "Отправить";
 			}
+		}
+
+		private void TcpSender_OnMessage(SenderMessageType type, string text)
+		{
+			guiContext.Post(delegate (object d)
+			{
+				MessageBox.Show(text, "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+			}, null);
+		}
+
+		private void TcpReceiver_OnMessage(ReceiverMessageType type, string text)
+		{
+			guiContext.Post(delegate (object d)
+			{
+				MessageBox.Show(text, "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+			}, null);
 		}
 
 		private void TcpSender_OnError(string message)
