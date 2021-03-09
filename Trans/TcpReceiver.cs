@@ -27,7 +27,7 @@ namespace Trans
 		protected long gotBytes;
 		protected bool isContinue;
 
-		public long GetGotBytes
+		public long GotBytes
 		{
 			get
 			{
@@ -35,7 +35,7 @@ namespace Trans
 			}
 		}
 
-		public long GetFileSize
+		public long FileSize
 		{
 			get
 			{
@@ -67,7 +67,7 @@ namespace Trans
 			thread.Start();
 		}
 
-		public void Abort()
+		public override void Abort()
 		{
 			if (tcpClient != null)
 			{
@@ -98,6 +98,7 @@ namespace Trans
 				}
 				using (NetworkStream stream = tcpClient.GetStream())
 				{
+					ReceiveAndSetConnectionConfig(stream);
 					ReceiveFileData(stream);
 					long startPos = CheckIsContinueNeeded();
 					SendStartPos(startPos, stream);
@@ -107,7 +108,7 @@ namespace Trans
 					}
 					if (startPos == -1)
 					{
-						OnReceiveMessage(ReceiverMessageType.SIZES_ARE_EQUAL, "Файл уже загружен");
+						OnReceiveMessage(ReceiverMessageType.SizesAreEqual, "Файл уже загружен");
 					}
 					else
 					{
@@ -127,6 +128,13 @@ namespace Trans
 			}*/
 			OnReceiveFinished();
 		}
+
+		protected void ReceiveAndSetConnectionConfig(NetworkStream stream)
+        {
+			byte[] config = Receive(stream);
+			int compressionTypeInt = BitConverter.ToInt32(config, 0);
+			SetCompresstionType((CompressionType)Enum.GetValues(typeof(CompressionType)).GetValue(compressionTypeInt));
+        }
 
 		/// <summary>
 		/// Check file exist, file size and hashes
@@ -199,7 +207,7 @@ namespace Trans
 
 	public enum ReceiverMessageType
 	{
-		NO_TYPE,
-		SIZES_ARE_EQUAL
+		None,
+		SizesAreEqual
 	}
 }

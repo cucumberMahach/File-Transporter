@@ -36,6 +36,7 @@ namespace Trans
 					comb_this_ip.Items.Add(ipaddress.ToString());
 				}
 			}
+			comb_compression.SelectedIndex = 0;
 			LoadConfig();
 		}
 
@@ -52,6 +53,7 @@ namespace Trans
 				txt_saveIn.Text = config.saveIn;
 				rb_this.Checked = config.rb_this;
 				rb_dist.Checked = config.rb_dist;
+				comb_compression.SelectedIndex = (int)config.compressionType;
 			}
 			catch (Exception)
 			{
@@ -70,6 +72,7 @@ namespace Trans
 			config.saveIn = txt_saveIn.Text;
 			config.rb_this = rb_this.Checked;
 			config.rb_dist = rb_dist.Checked;
+			config.compressionType = (CompressionType) Enum.GetValues(typeof(CompressionType)).GetValue(comb_compression.SelectedIndex);
 			config.Save();
 		}
 
@@ -118,11 +121,12 @@ namespace Trans
 
 		private void TcpReceiver_OnReceiveFinished()
 		{
-			tcpReceiver = null;
 			guiContext.Post(delegate(object d)
 			{
+				DrawStatistics(tcpReceiver);
 				btn_receive.Text = "Принять";
 				ClearAll();
+				tcpReceiver = null;
 			}, null);
 		}
 
@@ -134,7 +138,8 @@ namespace Trans
 				SetEnableControls(false);
 				btn_send.Enabled = true;
 				btn_send.Text = "Отмена";
-				tcpSender = new TcpSender(IPAddress.Parse(comb_this_ip.Text), int.Parse(txt_this_port.Text), IPAddress.Parse(txt_dist_ip.Text), int.Parse(txt_dist_port.Text), sendFilePath, lab_fileName.Text, (int)num_bufferSize.Value, rb_dist.Checked);
+				CompressionType compressionType = (CompressionType)Enum.GetValues(typeof(CompressionType)).GetValue(comb_compression.SelectedIndex);
+				tcpSender = new TcpSender(IPAddress.Parse(comb_this_ip.Text), int.Parse(txt_this_port.Text), IPAddress.Parse(txt_dist_ip.Text), int.Parse(txt_dist_port.Text), sendFilePath, lab_fileName.Text, (int)num_bufferSize.Value, compressionType, rb_dist.Checked);
 				tcpSender.OnUploadFinished += TcpSender_OnUploadFinished;
 				tcpSender.OnUploadError += TcpSender_OnError;
 				tcpSender.OnUploadMessage += TcpSender_OnMessage;
@@ -186,11 +191,12 @@ namespace Trans
 
 		private void TcpSender_OnUploadFinished()
 		{
-			tcpSender = null;
 			guiContext.Post(delegate(object d)
 			{
+				DrawStatistics(tcpSender);
 				btn_send.Text = "Отправить";
 				ClearAll();
+				tcpSender = null;
 			}, null);
 		}
 
@@ -225,11 +231,14 @@ namespace Trans
 		{
             long fileSize;
             long procBytes;
+			TcpFuncs bundle;
             if (tcpReceiver != null)
             {
-                fileSize = tcpReceiver.GetFileSize;
-                procBytes = tcpReceiver.GetGotBytes;
-            }
+                fileSize = tcpReceiver.FileSize;
+                procBytes = tcpReceiver.GotBytes;
+				bundle = tcpReceiver;
+
+			}
             else
             {
                 if (!(tcpSender != null))
@@ -238,9 +247,11 @@ namespace Trans
                     lab_time.Text = "-";
                     return;
                 }
-                fileSize = tcpSender.GetFileSize;
-                procBytes = tcpSender.GetUploadedBytes;
-            }
+                fileSize = tcpSender.FileSize;
+                procBytes = tcpSender.UploadedBytes;
+				bundle = tcpSender;
+
+			}
             pic_progress.Invalidate();
 			pic_plot.Invalidate();
 			if (stopwatch.ElapsedMilliseconds >= 1000L)
@@ -305,12 +316,22 @@ namespace Trans
 				}
 				plot_min = plotMin;
 				plot_max = Tools.RoundMaxSpeed(plotMax * (double)(1f - Config.plotMaxCof + 1f));
-				lab_maxSpeed.Text = Tools.ConvertSpeed(plot_max);
-				lab_speed.Text = Tools.ConvertSpeed(avgSpeedData);
+				lab_maxSpeed.Text = Tools.ConvertBytes(plot_max, Tools.Units.Speed);
+				lab_speed.Text = Tools.ConvertBytes(avgSpeedData, Tools.Units.Speed);
 				lab_time.Text = ((avgSpeedTimeData == 0.0) ? "∞" : Tools.ConvertTime((int)((double)(fileSize - procBytes) / avgSpeedTimeData)));
+
 				lastBytes = procBytes;
 				stopwatch.Restart();
 			}
+			DrawStatistics(bundle);
+		}
+
+		private void DrawStatistics(TcpFuncs bundle)
+        {
+			lab_sent.Text = Tools.ConvertBytes(bundle.SentDecompressedBytes, Tools.Units.Data);
+			lab_received.Text = Tools.ConvertBytes(bundle.ReceivedDecompressedBytes, Tools.Units.Data);
+			long savedBytes = bundle.SentDecompressedBytes - bundle.SentCompressedBytes + (bundle.ReceivedDecompressedBytes - bundle.ReceivedCompressedBytes);
+			lab_compress.Text = "Сэкономлено " + Tools.ConvertBytes(savedBytes, Tools.Units.Data);
 		}
 
 		private void FormMain_FormClosed(object sender, FormClosedEventArgs e)
@@ -326,7 +347,7 @@ namespace Trans
 			double proc;
 			if (tcpReceiver != null)
 			{
-				proc = (double)tcpReceiver.GetGotBytes / (double)tcpReceiver.GetFileSize;
+				proc = (double)tcpReceiver.GotBytes / (double)tcpReceiver.FileSize;
 			}
 			else
 			{
@@ -335,7 +356,7 @@ namespace Trans
 					graphics.DrawString(0.ToString("0.00") + "%", SystemFonts.DefaultFont, Brushes.Black, (float)(pictureBox.Width / 2) - SystemFonts.DefaultFont.Size * 4f / 2f, (float)(pictureBox.Height / 2) - (float)SystemFonts.DefaultFont.Height / 2f - 2f);
 					return;
 				}
-				proc = (double)tcpSender.GetUploadedBytes / (double)tcpSender.GetFileSize;
+				proc = (double)tcpSender.UploadedBytes / (double)tcpSender.FileSize;
 			}
 			graphics.FillRectangle(Brushes.LightGreen, 0f, 0f, (float)(proc * (double)pictureBox.Width), (float)pictureBox.Height);
 			if (!double.IsNaN(proc))

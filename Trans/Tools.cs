@@ -6,49 +6,116 @@ using System.Security.Cryptography;
 
 namespace Trans
 {
+    public enum CompressionType
+    {
+        None,
+        DeflateStream,
+        LZMA
+    }
+
     public class Tools
     {
+
+        public enum Units
+        {
+            Speed,
+            Data
+        }
+
         private static readonly NumberFormatInfo format = (NumberFormatInfo)CultureInfo.InvariantCulture.NumberFormat.Clone();
-        public static string ConvertSpeed(double bps)
+        public static string ConvertBytes(double bytes, Units units)
         {
             format.NumberGroupSeparator = " ";
             format.NumberDecimalDigits = 2;
             string text = "#,#.00";
-            string result;
-            if (bps == 0.0)
+            string result = "";
+            if (bytes == 0.0)
             {
-                result = "0 байт/сек";
+                switch (units)
+                {
+                    case Units.Speed:
+                        result = "0 Б/сек";
+                        break;
+                    case Units.Data:
+                        result = "0 Б";
+                        break;
+                }
             }
             else
             {
-                if (bps < 1024.0)
+                if (Math.Abs(bytes) < 1024.0)
                 {
-                    result = bps.ToString(text, format) + " байт/сек";
+                    result = bytes.ToString(text, format);
+                    switch (units)
+                    {
+                        case Units.Speed:
+                            result += " Б/сек";
+                            break;
+                        case Units.Data:
+                            result += " Б";
+                            break;
+                    }
                 }
                 else
                 {
-                    double kbps = bps / 1024.0;
-                    if (kbps < 1024.0)
+                    double kbps = bytes / 1024.0;
+                    if (Math.Abs(kbps) < 1024.0)
                     {
-                        result = kbps.ToString(text, format) + " кб/сек";
+                        result = kbps.ToString(text, format);
+                        switch (units)
+                        {
+                            case Units.Speed:
+                                result += " Кб/сек";
+                                break;
+                            case Units.Data:
+                                result += " Кб";
+                                break;
+                        }
                     }
                     else
                     {
                         double mbps = kbps / 1024.0;
-                        if (mbps < 1024.0)
+                        if (Math.Abs(mbps) < 1024.0)
                         {
-                            result = mbps.ToString(text, format) + " мб/сек";
+                            result = mbps.ToString(text, format);
+                            switch (units)
+                            {
+                                case Units.Speed:
+                                    result += " Мб/сек";
+                                    break;
+                                case Units.Data:
+                                    result += " Мб";
+                                    break;
+                            }
                         }
                         else
                         {
                             double gbps = mbps / 1024.0;
-                            if (gbps < 1024.0)
+                            if (Math.Abs(gbps) < 1024.0)
                             {
-                                result = gbps.ToString(text, format) + " гб/сек";
+                                result = gbps.ToString(text, format);
+                                switch (units)
+                                {
+                                    case Units.Speed:
+                                        result += " Гб/сек";
+                                        break;
+                                    case Units.Data:
+                                        result += " Гб";
+                                        break;
+                                }
                             }
                             else
                             {
-                                result = (gbps / 1024.0).ToString(text, format) + " тб/сек";
+                                result = (gbps / 1024.0).ToString(text, format);
+                                switch (units)
+                                {
+                                    case Units.Speed:
+                                        result += " Тб/сек";
+                                        break;
+                                    case Units.Data:
+                                        result += " Тб";
+                                        break;
+                                }
                             }
                         }
                     }
@@ -165,6 +232,34 @@ namespace Trans
             Array.Clear(buffer, 0, buffer.Length);
             source.Position = 0;
             source.SetLength(0);
+        }
+
+        public static byte[] Compress(byte[] data, CompressionType compressionType)
+        {
+            switch (compressionType)
+            {
+                case CompressionType.None:
+                default:
+                    return data;
+                case CompressionType.DeflateStream:
+                    return CompressByDeflateStream(data);
+                case CompressionType.LZMA:
+                    return Compress7Zip(data);
+            }
+        }
+
+        public static byte[] Decompress(byte[] data, CompressionType compressionType)
+        {
+            switch (compressionType)
+            {
+                case CompressionType.None:
+                default:
+                    return data;
+                case CompressionType.DeflateStream:
+                    return DecompressByDeflateStream(data);
+                case CompressionType.LZMA:
+                    return Decompress7Zip(data);
+            }
         }
 
         public static byte[] CompressByDeflateStream(byte[] data)

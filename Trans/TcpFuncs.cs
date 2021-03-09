@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -11,10 +12,47 @@ namespace Trans
 	public abstract class TcpFuncs
 	{
 		protected BinaryFormatter formatter = new BinaryFormatter();
+		protected long sentCompressedBytes;
+		protected long sentDecompressedBytes;
+		protected long receivedCompressedBytes;
+		protected long receivedDecompressedBytes;
+		protected CompressionType compressionType;
 
-        public TcpFuncs()
+		public long SentCompressedBytes
+		{
+			get
+			{
+				return sentCompressedBytes;
+			}
+		}
+
+		public long SentDecompressedBytes
+		{
+			get
+			{
+				return sentDecompressedBytes;
+			}
+		}
+
+		public long ReceivedCompressedBytes
+		{
+			get
+			{
+				return receivedCompressedBytes;
+			}
+		}
+
+		public long ReceivedDecompressedBytes
+		{
+			get
+			{
+				return receivedDecompressedBytes;
+			}
+		}
+
+		public TcpFuncs(CompressionType compressionType = CompressionType.None)
         {
-			
+			this.compressionType = compressionType;
 		}
 
 		protected void ListenAndCheckBeginBytes(IPAddress localIP, int localPort, ref TcpListener tcpListener, ref TcpClient tcpClient)
@@ -28,7 +66,7 @@ namespace Trans
 			catch (SocketException)
 			{
 				tcpListener.Stop();
-				Thread.ResetAbort();
+				Abort();
 				return;
 			}
 			NetworkStream stream = tcpClient.GetStream();
@@ -38,7 +76,7 @@ namespace Trans
 				stream.Close();
 				tcpClient.Close();
 				tcpListener.Stop();
-				Thread.ResetAbort();
+				Abort();
 			}
 		}
 
@@ -51,7 +89,7 @@ namespace Trans
 			}
 			catch (SocketException)
 			{
-				Thread.ResetAbort();
+				Abort();
 			}
 			NetworkStream stream = tcpClient.GetStream();
 			Send(stream, Config.beginBytes);
@@ -60,26 +98,40 @@ namespace Trans
 
 		protected void Send(NetworkStream stream, byte[] data)
 		{
-			formatter.Serialize(stream, Tools.Compress7Zip(data));
+			byte[] compressedData = Tools.Compress(data, compressionType);
+			formatter.Serialize(stream, compressedData);
+			sentCompressedBytes += compressedData.Length;
+			sentDecompressedBytes += data.Length;
 		}
 
 		protected byte[] Receive(NetworkStream stream)
 		{
-			return Tools.Decompress7Zip((byte[])formatter.Deserialize(stream));
+			byte[] compressedData = (byte[])formatter.Deserialize(stream);
+			byte[] decompressedData = Tools.Decompress(compressedData, compressionType);
+			receivedCompressedBytes += compressedData.Length;
+			receivedDecompressedBytes += decompressedData.Length;
+			return decompressedData;
 		}
 
 		protected bool IsValidBeginBytes(NetworkStream stream, byte[] beginBytes)
 		{
 			byte[] array = Receive(stream);
-			for (int i = 0; i < array.Length; i++)
-			{
-				bool byteNotValid = array[i] != beginBytes[i];
-				if (byteNotValid)
-				{
-					return false;
-				}
-			}
-			return true;
+			return Enumerable.SequenceEqual(array, beginBytes);
 		}
+
+		protected void ClearDataStatistics()
+        {
+			sentCompressedBytes = 0;
+			sentDecompressedBytes = 0;
+			receivedCompressedBytes = 0;
+			receivedDecompressedBytes = 0;
+		}
+
+		protected void SetCompresstionType(CompressionType type)
+        {
+			compressionType = type;
+        }
+
+		public abstract void Abort();
 	}
 }

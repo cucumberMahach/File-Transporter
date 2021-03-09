@@ -17,6 +17,7 @@ namespace Trans
 		public string saveIn;
 		public bool rb_this;
 		public bool rb_dist;
+		public CompressionType compressionType;
 
 		public Config()
 		{
@@ -28,6 +29,7 @@ namespace Trans
 			saveIn = "";
 			rb_this = true;
 			rb_dist = false;
+			compressionType = CompressionType.None;
 		}
 
 		public static Config Load()

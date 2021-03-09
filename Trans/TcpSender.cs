@@ -24,10 +24,11 @@ namespace Trans
         protected bool isContinue;
         protected IPAddress localIP;
         protected int localPort;
+        protected CompressionType prefferedCompressionType;
 
         protected bool isAborted = false;
 
-        public long GetFileSize
+        public long FileSize
         {
             get
             {
@@ -35,7 +36,7 @@ namespace Trans
             }
         }
 
-        public long GetUploadedBytes
+        public long UploadedBytes
         {
             get
             {
@@ -51,7 +52,7 @@ namespace Trans
             }
         }
 
-        public TcpSender(IPAddress localIP, int localPort, IPAddress remoteIP, int remotePort, string filePath, string fileName, int bufferSizeKb, bool connect)
+        public TcpSender(IPAddress localIP, int localPort, IPAddress remoteIP, int remotePort, string filePath, string fileName, int bufferSizeKb, CompressionType compressionType, bool connect)
         {
             this.localIP = localIP;
             this.localPort = localPort;
@@ -61,6 +62,7 @@ namespace Trans
             this.fileName = fileName;
             this.connect = connect;
             bufferSize = bufferSizeKb * 1024;
+            prefferedCompressionType = compressionType;
             thread = new Thread(new ThreadStart(Run));
         }
 
@@ -69,7 +71,7 @@ namespace Trans
             thread.Start();
         }
 
-        public void Abort()
+        public override void Abort()
         {
             if (isAborted)
                 return;
@@ -101,11 +103,13 @@ namespace Trans
                 {
                     using (FileStream fileStream = File.OpenRead(filePath))
                     {
+                        SendConnectionConfig(stream);
+                        SetCompresstionType(prefferedCompressionType);
                         SendFileData(fileStream, stream);
                         uploadedBytes = ReceiveUploadedBytes(stream);
                         if (uploadedBytes == -1)
                         {
-                            OnUploadMessage(SenderMessageType.SIZES_ARE_EQUAL, "Файл уже загружен");
+                            OnUploadMessage(SenderMessageType.SizesAreEqual, "Файл уже загружен");
                         }
                         else
                         {
@@ -127,6 +131,12 @@ namespace Trans
                 Abort();
             }*/
             OnUploadFinished();
+        }
+
+        protected void SendConnectionConfig(NetworkStream netStream)
+        {
+            byte[] compressionBytes = BitConverter.GetBytes((int)prefferedCompressionType);
+            Send(netStream, compressionBytes);
         }
 
         protected long ReceiveUploadedBytes(NetworkStream netStream)
@@ -187,7 +197,7 @@ namespace Trans
 
     public enum SenderMessageType
     {
-        NO_TYPE,
-        SIZES_ARE_EQUAL
+        None,
+        SizesAreEqual
     }
 }
