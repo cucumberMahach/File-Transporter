@@ -23,9 +23,126 @@ namespace Trans
         }
 
         private static readonly NumberFormatInfo format = (NumberFormatInfo)CultureInfo.InvariantCulture.NumberFormat.Clone();
-        public static string ConvertBytes(double bytes, Units units)
+        
+        public static string ConvertBytesSpeed(double bytes)
         {
             format.NumberGroupSeparator = " ";
+            format.NumberDecimalDigits = 2;
+            string text = "#,#.00";
+            string result;
+            bytes *= 8;
+            if (bytes == 0.0)
+            {
+                result = "0 Б";
+            }
+            else
+            {
+                if (Math.Abs(bytes) < 1000.0)
+                {
+                    result = bytes.ToString(text, format);
+                    result += " бит/сек";
+                }
+                else
+                {
+                    double kbps = bytes / 1000.0;
+                    if (Math.Abs(kbps) < 1000.0)
+                    {
+                        result = kbps.ToString(text, format);
+                        result += " Кбит/сек";
+                    }
+                    else
+                    {
+                        double mbps = kbps / 1000.0;
+                        if (Math.Abs(mbps) < 1000.0)
+                        {
+                            result = mbps.ToString(text, format);
+                            result += " Мбит/сек";
+                        }
+                        else
+                        {
+                            double gbps = mbps / 1000.0;
+                            if (Math.Abs(gbps) < 1000.0)
+                            {
+                                result = gbps.ToString(text, format);
+                                result += " Гбит/сек";
+                            }
+                            else
+                            {
+                                result = (gbps / 1000.0).ToString(text, format);
+                                result += " Тбит/сек";
+                            }
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+        public static string ConvertBytesData(double bytes)
+        {
+            format.NumberGroupSeparator = " ";
+            format.NumberDecimalDigits = 2;
+            string text = "#,#.00";
+            string result;
+            if (bytes == 0.0)
+            {
+                result = "0 байт";
+            }
+            else
+            {
+                if (Math.Abs(bytes) < 1024.0)
+                {
+                    result = bytes.ToString(text, format);
+                    result += " байт";
+                }
+                else
+                {
+                    double kbps = bytes / 1024.0;
+                    if (Math.Abs(kbps) < 1024.0)
+                    {
+                        result = kbps.ToString(text, format);
+                        result += " Кбайт";
+                    }
+                    else
+                    {
+                        double mbps = kbps / 1024.0;
+                        if (Math.Abs(mbps) < 1024.0)
+                        {
+                            result = mbps.ToString(text, format);
+                            result += " Мбайт";
+                        }
+                        else
+                        {
+                            double gbps = mbps / 1024.0;
+                            if (Math.Abs(gbps) < 1024.0)
+                            {
+                                result = gbps.ToString(text, format);
+                                result += " Гбайт";
+                            }
+                            else
+                            {
+                                result = (gbps / 1024.0).ToString(text, format);
+                                result += " Тбайт";
+                            }
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+        public static string ConvertBytes(double bytes, Units units)
+        {
+            switch (units)
+            {
+                case Units.Speed:
+                    return ConvertBytesSpeed(bytes);
+                case Units.Data:
+                    return ConvertBytesData(bytes);
+                default:
+                    return "-";
+            }
+            /*format.NumberGroupSeparator = " ";
             format.NumberDecimalDigits = 2;
             string text = "#,#.00";
             string result = "";
@@ -121,7 +238,7 @@ namespace Trans
                     }
                 }
             }
-            return result;
+            return result;*/
         }
 
         public static string ConvertTime(int sec)
@@ -156,43 +273,43 @@ namespace Trans
             return num;
         }
 
-        public static double RoundMaxSpeed(double bps)
+        public static double RoundMaxSpeed(double bytes)
         {
             double result;
-            if (bps == 0.0)
+            if (bytes == 0.0)
             {
                 result = 0.0;
             }
             else
             {
-                if (bps < 1024.0)
+                if (bytes < 1000.0)
                 {
-                    result = GetNearestUnitOver(bps);
+                    result = GetNearestUnitOver(bytes);
                 }
                 else
                 {
-                    double kbps = bps / 1024.0;
-                    if (kbps < 1024.0)
+                    double kbps = bytes / 1000.0;
+                    if (kbps < 1000.0)
                     {
-                        result = GetNearestUnitOver(kbps) * 1024.0;
+                        result = GetNearestUnitOver(kbps) * 1000.0;
                     }
                     else
                     {
-                        double mbps = kbps / 1024.0;
-                        if (mbps < 1024.0)
+                        double mbps = kbps / 1000.0;
+                        if (mbps < 1000.0)
                         {
-                            result = GetNearestUnitOver(mbps) * 1024.0 * 1024.0;
+                            result = GetNearestUnitOver(mbps) * 1000.0 * 1000.0;
                         }
                         else
                         {
-                            double gbps = mbps / 1024.0;
-                            if (gbps < 1024.0)
+                            double gbps = mbps / 1000.0;
+                            if (gbps < 1000.0)
                             {
-                                result = GetNearestUnitOver(gbps) * 1024.0 * 1024.0 * 1024.0;
+                                result = GetNearestUnitOver(gbps) * 1000.0 * 1000.0 * 1000.0;
                             }
                             else
                             {
-                                result = GetNearestUnitOver(gbps / 1024.0) * 1024.0 * 1024.0 * 1024.0 * 1024.0;
+                                result = GetNearestUnitOver(gbps / 1000.0) * 1000.0 * 1000.0 * 1000.0 * 1000.0;
                             }
                         }
                     }

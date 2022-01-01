@@ -21,7 +21,7 @@ namespace Trans
 		private long lastBytes = 0L;
 		private List<double> plotValues = new List<double>();
         private double plot_min = 0.0;
-		private double plot_max = 1024.0;
+		private double plot_max = 1000.0;
 		private bool continueSkipped;
 
 		public FormMain()
@@ -256,7 +256,7 @@ namespace Trans
 			pic_plot.Invalidate();
 			if (stopwatch.ElapsedMilliseconds >= 1000L)
 			{
-				double item = (double)(procBytes - lastBytes) / ((double)stopwatch.ElapsedMilliseconds / 1000.0);
+				double item = (double)(procBytes - lastBytes) / ((double)stopwatch.ElapsedMilliseconds / 1000.0) * 8;
 				if (tcpReceiver != null)
 				{
 					if (!continueSkipped && tcpReceiver.IsContinue)
@@ -302,7 +302,7 @@ namespace Trans
 					plotValues.RemoveAt(0);
 				}
 				double plotMin = plotValues[0];
-				double plotMax = 1024.0;
+				double plotMax = 1000.0;
 				foreach (double plotValue in plotValues)
 				{
 					if (plotValue < plotMin)
@@ -316,8 +316,8 @@ namespace Trans
 				}
 				plot_min = plotMin;
 				plot_max = Tools.RoundMaxSpeed(plotMax * (double)(1f - Config.plotMaxCof + 1f));
-				lab_maxSpeed.Text = Tools.ConvertBytes(plot_max, Tools.Units.Speed);
-				lab_speed.Text = Tools.ConvertBytes(avgSpeedData, Tools.Units.Speed);
+				lab_maxSpeed.Text = Tools.ConvertBytes(plot_max/8, Tools.Units.Speed);
+				lab_speed.Text = Tools.ConvertBytes(avgSpeedData/8, Tools.Units.Speed);
 				lab_time.Text = ((avgSpeedTimeData == 0.0) ? "∞" : Tools.ConvertTime((int)((double)(fileSize - procBytes) / avgSpeedTimeData)));
 
 				lastBytes = procBytes;
