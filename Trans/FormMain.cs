@@ -318,7 +318,7 @@ namespace Trans
 				plot_max = Tools.RoundMaxSpeed(plotMax * (double)(1f - Config.plotMaxCof + 1f));
 				lab_maxSpeed.Text = Tools.ConvertBytes(plot_max/8, Tools.Units.Speed);
 				lab_speed.Text = Tools.ConvertBytes(avgSpeedData/8, Tools.Units.Speed);
-				lab_time.Text = ((avgSpeedTimeData == 0.0) ? "∞" : Tools.ConvertTime((int)((double)(fileSize - procBytes) / avgSpeedTimeData)));
+				lab_time.Text = ((avgSpeedTimeData == 0.0) ? "∞" : Tools.ConvertTime((int)((double)(fileSize - procBytes) * 8 / avgSpeedTimeData)));
 
 				lastBytes = procBytes;
 				stopwatch.Restart();

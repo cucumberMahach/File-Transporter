@@ -89,8 +89,8 @@ namespace Trans
 
         public void Run()
         {
-            /*try
-            {*/
+            try
+            {
                 if (connect)
                 {
                     tcpClient = ConnectAndSendBeginBytes(remoteIP, remotePort);
@@ -122,14 +122,14 @@ namespace Trans
                 {
                     tcpListener.Stop();
                 }
-            /*}
+            }
             catch (Exception ex)
             {
                 if (ex is ThreadAbortException || ex is ThreadStateException)
                     return;
                 OnUploadError(ex.Message);
                 Abort();
-            }*/
+            }
             OnUploadFinished();
         }
 
